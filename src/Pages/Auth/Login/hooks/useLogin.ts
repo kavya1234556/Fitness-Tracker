@@ -44,7 +44,7 @@ const useLogin = () => {
       localStorage.setItem("loggedIn", "true");
       localStorage.setItem("user_id", loggedInUser.id);
       toast.success("Logged In successfully");
-      navigate("/home");
+      navigate("/dashboard");
     } else {
       toast.error("Invalid Email or Password");
     }

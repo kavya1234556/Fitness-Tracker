@@ -1,46 +1,63 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { sidebarMenuList } from "../../data/sidebar";
+import { sidebarMenuList, SidebarType } from "@/data/sidebar";
+import { useState } from "react";
+import ArrowRight from "../icon/arrow-right";
+import Folder from "../icon/folder";
+import Document from "../icon/document";
 
-function getMainLink(pathname: string) {
-  return pathname.split("/")[1];
+export function Page() {
+  console.log("Try", sidebarMenuList);
+  return (
+    <ul>
+      {sidebarMenuList.map((node) => (
+        <Sidebar sideBarList={node} key={node.id} />
+      ))}
+    </ul>
+  );
 }
 
-const Sidebar = () => {
-  const pathname = useLocation();
-  return (
-    <>
-      <div className="mb-[10px] text-center p-[20px] font-bold text-[30px] text-red bg-white">
-        FITNESS
-      </div>
-      <div>
-        {sidebarMenuList?.map((val) => {
-          return (
-            <div key={val.id}>
-              <NavLink
-                className="h-[56px] pl-[20px] flex gap-[14px] items-center"
-                to={val.link}
-                style={({ isActive }) => {
-                  const isActiveNav =
-                    isActive || getMainLink(pathname.pathname) === val.mainlink;
-                  return {
-                    color: isActiveNav ? "#121f3e" : "#93B0C8",
-                    borderLeft: isActiveNav ? "4px solid #4f1787 " : "",
-                  };
-                }}
-              >
-                <div className="flex gap-[14px] items-center">
-                  <div>{val.icon}</div>
-                  <div className="text-sm font-normal capitalize text-theme">
-                    {val?.title}
-                  </div>
-                </div>
-              </NavLink>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
+type SidebarProps = {
+  sideBarList: SidebarType;
 };
 
-export default Sidebar;
+function Sidebar({ sideBarList }: SidebarProps) {
+  console.log("🚀 ~ Sidebar ~ sideBarList:", sideBarList);
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <li key={sideBarList.id}>
+      <span className="flex items-center gap-1.5 py-1">
+        {sideBarList.subMenu && sideBarList.subMenu.length > 0 && (
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-1 -m-1"
+            aria-label={isOpen ? "Collapse" : "Expand"}
+          >
+            <ArrowRight
+              className={`size-4 text-gray-500 ${isOpen ? "rotate-90" : ""}`}
+            />
+          </button>
+        )}
+
+        {sideBarList.subMenu ? (
+          <Folder
+            className={`size-6 text-sky-500 ${
+              sideBarList.subMenu.length === 0 ? "ml-[22px]" : ""
+            }`}
+          />
+        ) : (
+          <Document className="ml-[22px] size-6 text-gray-900" />
+        )}
+        {sideBarList.title}
+      </span>
+      {isOpen && sideBarList.subMenu && (
+        <ul className="pl-6">
+          {sideBarList.subMenu.map((node) => (
+            <Sidebar sideBarList={node} key={node.id} />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+export default Page;
